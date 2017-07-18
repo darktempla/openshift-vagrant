@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+#
+# Variables
+#
+
+# v3.6.0-rc.0
+OC_VERSION="v3.6.0-rc.0"
+OC_VERSION_HASH="98b3d56"
+
+#
+# Script
+#
+
 echo '### BEGIN: Bootstrapping OpenShift environment...'
 
 echo '### Install Dependencies...'
@@ -16,36 +28,25 @@ echo '### Install OpenShift CLI...'
 
 mkdir /home/vagrant/oc-tools
 cd /home/vagrant/oc-tools
-wget https://github.com/openshift/origin/releases/download/v1.5.1/openshift-origin-client-tools-v1.5.1-7b451fc-linux-64bit.tar.gz --quiet
-tar -xzf openshift-origin-client-tools-v1.5.1-7b451fc-linux-64bit.tar.gz
-echo 'export PATH=$PATH:~/oc-tools/openshift-origin-client-tools-v1.5.1-7b451fc-linux-64bit/' >> /home/vagrant/.bashrc
+wget https://github.com/openshift/origin/releases/download/$OC_VERSION/openshift-origin-client-tools-$OC_VERSION-$OC_VERSION_HASH-linux-64bit.tar.gz --quiet
+tar -xzf openshift-origin-client-tools-$OC_VERSION-$OC_VERSION_HASH-linux-64bit.tar.gz
+
+echo "export PATH=$PATH:~/oc-tools/openshift-origin-client-tools-$OC_VERSION-$OC_VERSION_HASH-linux-64bit/" >> /home/vagrant/.bashrc
 
 echo '### Install Docker...'
 curl -fsSL https://get.docker.com/ | sh 		# download and install docker
 usermod -aG docker vagrant						# add vagrant to docker group to prevent sudoing
-docker run hello-world							# verify the installation is successful
+
 systemctl enable docker 						# ensure docker daemon starts on server restart
-service docker start
+service docker start							# required to create docker directories
+service docker stop
 
 echo '{ "insecure-registries" : ["172.30.0.0/16"] }' > /etc/docker/daemon.json
 
-service docker stop
-service docker start
+service docker start 							# pick up configuration changes
+docker run hello-world							# verify the installation is successful
 
 echo '### Setup OpenShift'
 mkdir /home/vagrant/openshift
 
 echo '### END: Bootstrapping OpenShift environment...'
-
-#
-# After install
-#
-
-# create and start a new openshift cluster
-# oc cluster up --public-hostname='10.0.15.10' --host-data-dir='/home/vagrant/openshift/profiles/nonprod/data' --host-config-dir='/home/vagrant/openshift/profiles/nonprod/config'
-
-# stop the cluster 
-# oc cluster down
-
-# access the oc cluster via web inside vagrant machine
-# https://10.0.15.10:8443/console
