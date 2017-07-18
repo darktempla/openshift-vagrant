@@ -6,9 +6,9 @@ Project for spinning OpenShift up on a CentOS VM using Vagrant.
 
 You can change these parameters as desired
 
-	OC_TOOLS_START = true/false - start when creating the vagrant VM   	(default: true)
+	OC_TOOLS_START = true/false - start the cluster when creating the vagrant VM   	(default: true)
 	OC_TOOLS_VERSION = the oc tools versions to download
-	OC_TOOLS_VERSION_HASH = the git has of the oc version to download
+	OC_TOOLS_VERSION_HASH = the git hash of the oc version to download
 
 # Running
 
